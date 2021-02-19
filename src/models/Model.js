@@ -3,6 +3,9 @@ const Database = require('../database/Database');
 class Model {
 	constructor(id) {
 		this.id = id;
+		this.createdAt = Date.now();
+		this.editedAt = null;
+		this.deletedAt = null;
 	}
 
 	static connect() {

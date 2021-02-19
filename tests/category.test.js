@@ -75,7 +75,6 @@ test('Category was found by ID.', async () => {
 		faker.lorem.sentence(),
 	);
 	const retrievedCategory = await Category.findById(newCategory.getId());
-
 	expect(retrievedCategory.getTitle()).toMatch(newCategory.getTitle());
 	expect(retrievedCategory.getCreatedAt()).toBeInstanceOf(Date);
 	expect(retrievedCategory.getEditedAt()).toBeNull();

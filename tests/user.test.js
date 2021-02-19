@@ -212,7 +212,6 @@ test('User was deleted successfully.', async () => {
 	const wasDeleted = await user.delete();
 
 	expect(wasDeleted).toBe(true);
-
 	const retrievedUser = await User.findById(user.getId());
 
 	expect(retrievedUser.getCreatedAt()).toBeInstanceOf(Date);
