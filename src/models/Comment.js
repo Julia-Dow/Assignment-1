@@ -36,16 +36,18 @@ class Comment extends Model {
             var newCom = new Comment(results.insertId,user_id,post_id,content)
             await newCom.setUser();
             await newCom.setPost();
+            await connection.end();
+
             return newCom;
 
         }
         catch(error){
             console.log(error)
+            await connection.end();
+
             return null;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
     static async create(user_id,post_id,content,reply_id = null){
@@ -56,6 +58,7 @@ class Comment extends Model {
             
             let results;
             if(content.length == 0){
+                await connection.end();
                 return null;
             }
                 
@@ -70,16 +73,16 @@ class Comment extends Model {
 
             await newCom.setUser();
             await newCom.setPost();
+            await connection.end();
             return newCom;
 
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return null;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
     async setUser(){        
@@ -127,7 +130,8 @@ class Comment extends Model {
 		    [results] = await connection.query(sql,[id]);
 
             if(results[0] == null){
-            return await null
+                await connection.end();
+                return await null
             }
 
             var retrieved = new Comment(results[0].id,results[0].user_id,results[0].post,results[0].content,results[0].reply_id)           
@@ -140,18 +144,17 @@ class Comment extends Model {
             if(results[0].deleted_at != null){
                 retrieved.setDeletedAt( new Date(results[0].deleted_at)) 
             }
+            await connection.end();
 
-
+            return await retrieved
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return await null
         }
-        finally{
-            await connection.end();
-        }
 
-        return await retrieved
+        
     }
 
     async delete(){
@@ -164,16 +167,15 @@ class Comment extends Model {
 		    [results] = await connection.execute(sql,[this.id]);
             
             this.setDeletedAt(Date.now());//fix
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     
     }
 
@@ -183,6 +185,7 @@ class Comment extends Model {
         let results;
 
         if( this.content.length == 0 ){
+            await connection.end();
             return false;
         }
 
@@ -191,16 +194,15 @@ class Comment extends Model {
 		    [results] = await connection.execute(sql,[this.content,this.id]);
             
             this.setEditedAt(Date.now());
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
     setContent(content){

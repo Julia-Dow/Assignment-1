@@ -28,23 +28,25 @@ class Category extends Model {
             
             let results;        
             if(title.length == 0){
-            return null;
+                await connection.end();
+                return null;
             }
 
 
             [results] = await connection.execute(sql,[created_by,title,description])
             var newCat = new Category(results.insertId,created_by,title,description)
             await newCat.setUser();
+
+            await connection.end();
             return newCat;
 
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return null;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
     getTitle(){
@@ -71,7 +73,8 @@ class Category extends Model {
 		
 		    [results] = await connection.query(sql,[id]);
             if(results[0] == null){
-            return await null
+                await connection.end();
+                return await null
             }
 
             var retrieved = new Category(results[0].id,results[0].user_id,results[0].title,results[0].description)           
@@ -85,17 +88,17 @@ class Category extends Model {
                 retrieved.setDeletedAt( new Date(results[0].deleted_at)) 
             }
 
+            await connection.end();
+            return await retrieved
 
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return await null
         }
-        finally{
-            await connection.end();
-        }
 
-        return await retrieved
+        
     }
 
     static async findByTitle(title){
@@ -106,7 +109,8 @@ class Category extends Model {
 		
 		    [results] = await connection.query(sql,[title]);
             if(results[0] == null){
-            return await null
+                await connection.end();
+                return await null
             }
 
             var retrieved = new Category(results[0].id,results[0].user_id,results[0].title,results[0].description)           
@@ -120,17 +124,17 @@ class Category extends Model {
                 retrieved.setDeletedAt( new Date(results[0].deleted_at)) 
             }
 
+            await connection.end();
+            return await retrieved
 
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return await null
         }
-        finally{
-            await connection.end();
-        }
 
-        return await retrieved
+        
     }
 
     async delete(){
@@ -143,16 +147,15 @@ class Category extends Model {
 		    [results] = await connection.execute(sql,[this.id]);
             
             this.setDeletedAt(Date.now());//fix
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     
     }
 
@@ -166,6 +169,7 @@ class Category extends Model {
         let results;
 
         if( this.title == 0 ){
+            await connection.end();
             return false;
         }
 
@@ -174,16 +178,15 @@ class Category extends Model {
 		    [results] = await connection.execute(sql,[this.title,this.description,this.id]);
             
             this.setEditedAt(Date.now());
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
 }

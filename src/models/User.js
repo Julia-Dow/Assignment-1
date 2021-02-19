@@ -20,6 +20,7 @@ class User extends Model {
     static async create(username, email, password) {
 		const connection = await Model.connect();
         if(username == "" || email == "" || password == "" ){
+            await connection.end();
             return null;
         }
 
@@ -30,18 +31,15 @@ class User extends Model {
         {
             [results] = await connection.execute(sql, [username, email, password]);        
             var newuser = new User(results.insertId,username,email,password)
-
+            await connection.end();
             return newuser;
 
         }
         catch(error)
         {
             console.log(error);
-            return null;
-        }
-        finally
-        {
             await connection.end();
+            return null;
         }
 
 	}
@@ -55,7 +53,8 @@ class User extends Model {
 		
 		    [results] = await connection.query(sql,[id]);
             if(results[0] == null){
-            return await null
+                await connection.end();
+                return await null
             }
 
             var retrieved = new User(results[0].id,results[0].username,results[0].email,results[0].password)           
@@ -70,20 +69,17 @@ class User extends Model {
             }
 
             retrieved.setAvatar(results[0].avatar)
+            await connection.end();
             return await retrieved
-
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return await null
         }
-        finally{
-            await connection.end();
-        }
-
 
     }
-
+    
     static async findByEmail(email){
         const connection = await Model.connect();
         try{
@@ -92,6 +88,7 @@ class User extends Model {
 		
 		    [results] = await connection.query(sql,[email]);
             if(results[0] == null){
+                await connection.end();
                 return await null
             }
 
@@ -107,16 +104,14 @@ class User extends Model {
             }
 
             retrieved.setAvatar(results[0].avatar)
+            await connection.end();
             return 	retrieved
         }
         catch(error){
             console.log(error)
-            return await null;
-        }
-        finally{
             await connection.end();
-        }
-     
+            return await null;
+        }    
    
     }
 
@@ -155,6 +150,7 @@ class User extends Model {
         let results;
 
         if( this.username.length == 0 || this.email.length == 0){
+            await connection.end();
             return false;
         }
 
@@ -163,16 +159,15 @@ class User extends Model {
 		    [results] = await connection.execute(sql,[this.username,this.email, this.avatar,this.id]);
             
             this.setEditedAt(Date.now());
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
     async delete(){
@@ -185,16 +180,15 @@ class User extends Model {
 		    [results] = await connection.execute(sql,[this.id]);
             
             this.setDeletedAt(Date.now());//fix
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     }
     
 }

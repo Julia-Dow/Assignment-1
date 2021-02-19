@@ -33,6 +33,7 @@ class Post extends Model {
             
             let results;        
             if(title.length == 0 || content.length == 0){
+                await connection.end();
                 return null;
             }
 
@@ -40,16 +41,17 @@ class Post extends Model {
             var newPost = new Post(results.insertId,user_id, category_id, title, type, content)
             await newPost.setUser();
             await newPost.setCategory()
+
+            await connection.end();
             return newPost;
 
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return null;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
     static async findById(id){
@@ -60,7 +62,8 @@ class Post extends Model {
 		
 		    [results] = await connection.query(sql,[id]);
             if(results[0] == null){
-            return await null
+                await connection.end();
+                return await null
             }
 
             var retrieved = new Post(results[0].id,results[0].user_id,results[0].category_id,results[0].title,results[0].type,results[0].content)           
@@ -74,17 +77,16 @@ class Post extends Model {
                 retrieved.setDeletedAt( new Date(results[0].deleted_at)) 
             }
 
-
+            await connection.end();
+            return await retrieved
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return await null
         }
-        finally{
-            await connection.end();
-        }
 
-        return await retrieved
+        
     }
 
     async delete(){
@@ -97,16 +99,15 @@ class Post extends Model {
 		    [results] = await connection.execute(sql,[this.id]);
             
             this.setDeletedAt(Date.now());//fix
-
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     
     }
 
@@ -144,6 +145,7 @@ class Post extends Model {
         let results;
 
         if( this.title.length == 0 || this.content.length == 0 || this.type == 'URL'){
+            await connection.end();
             return false;
         }
 
@@ -153,15 +155,15 @@ class Post extends Model {
             
             this.setEditedAt(Date.now());
 
+            await connection.end();
             return true;
         }
         catch(error){
             console.log(error)
+            await connection.end();
             return false;
         }
-        finally{
-            await connection.end();
-        }
+
     }
 
 }
