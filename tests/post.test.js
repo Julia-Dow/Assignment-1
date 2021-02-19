@@ -107,24 +107,6 @@ test('Post was not created with blank content.', async () => {
 	expect(post).toBeNull();
 });
 
-test('Post was not created with duplicate title.', async () => {
-	const title = faker.lorem.word();
-
-	await Post.create(
-		user.getId(),
-		title,
-		faker.lorem.sentence(),
-	);
-
-	const post = await Post.create(
-		user.getId(),
-		title,
-		faker.lorem.sentence(),
-	);
-
-	expect(post).toBeNull();
-});
-
 test('Post was found by ID.', async () => {
 	const newPost = await Post.create(
 		user.getId(),
